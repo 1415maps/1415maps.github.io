@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples
+      on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+  <title>FOL</title>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.26/dijit/themes/nihilo/nihilo.css">
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.26/esri/css/esri.css">
+  <style>
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+
+      #map{
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #sliderWrapper {
+        position:absolute;
+        right: 30px;
+        bottom:30px;
+        z-Index: 40;
+
+        width: 250px;
+        height: 50px;
+
+        -moz-box-shadow: 0 0 5px #888;
+        -webkit-box-shadow: 0 0 5px #888;
+        box-shadow: 0 0 5px #888;
+      }
+      #sliderLabels {
+        position: relative;
+        top: -1px;
+        height: 1.2em;
+        font-size: 80%;
+        font-weight: bold;
+        font-family: arial;
+        color: #444;
+        padding: 3px;
+        margin: 5px 10px 0 10px;
+      }
+     #LocateButton {
+      position: absolute;
+      top: 95px;
+      left: 20px;
+      z-index: 100;
+    }
+    </style>
+  <script type="text/javascript">
+    var dojoConfig = {
+      parseOnLoad: true
+    };
+  </script>
+  <script type="text/javascript" src="https://js.arcgis.com/3.26/"></script>
+  <script type="text/javascript">
+    require([
+        "esri/map",
+        "esri/layers/ArcGISTiledMapServiceLayer",
+        "esri/layers/FeatureLayer",
+        "esri/geometry/Point",
+        "esri/SpatialReference",
+        "dojo/on",
+        "dijit/registry",
+        "esri/dijit/LocateButton",
+        "esri/config",
+        "esri/tasks/GeometryService",
+        
+        "esri/dijit/InfoWindowLite",
+        "esri/InfoTemplate",
+        "esri/layers/FeatureLayer",
+        "dojo/dom-construct",
+        "dojo/domReady!",
+        
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+        "dijit/form/HorizontalSlider",
+        "dijit/form/HorizontalRuleLabels"
+      ],
+
+      function(
+            Map, 
+            ArcGISTiledMapServiceLayer, 
+            FeatureLayer, 
+            Point, 
+            SpatialReference, 
+            on, 
+            registry, 
+            LocateButton, 
+            esriConfig, 
+            GeometryService,
+            InfoWindowLite,
+            InfoTemplate,
+            FeatureLayer,
+            domConstruct
+        ) {
+        
+        //esriConfig geometery service
+        esriConfig.defaults.geometryService = new GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+
+        //Create Map
+        var map = new Map("map", {
+          center: new Point(1693436, 5675526, new SpatialReference({
+            wkid: 2193
+          })),
+          zoom: 8
+        });
+
+        //Add Basemap Layers for Slider
+        var oceans = new ArcGISTiledMapServiceLayer("https://maps.npdc.govt.nz/arcgis/rest/services/Aerial/MapServer");
+        map.addLayer(oceans);
+        var streets = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/oso/MapServer");
+        map.addLayer(streets);
+        
+        var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, map.root));
+        infoWindow.startup();
+        map.setInfoWindow(infoWindow);
+
+        var template = new InfoTemplate();
+        template.setTitle("<b>${Name}</b>");
+        template.setContent("${Details}");
+
+        //add a layer to the map
+        var featureLayer = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Lighting_Installations/FeatureServer/0", {
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template,
+          outFields: ["Name" , "Details"],
+        });
+        map.addLayer(featureLayer);
+
+        map.infoWindow.resize(200, 200);
+
+        //Wire event handler for the dojo slider
+        map.on("load", function() {
+          on(registry.byId('sliderOpacity'), 'change', changeOpacity);
+        });
+
+        //Slider Logic
+        function changeOpacity(op) {
+          var newOp = (op / 100);
+          streets.setOpacity(1.0 - newOp);
+          //oceans.setOpacity(newOp);
+        }
+
+        //locate button
+        geoLocate = new LocateButton({
+          map: map
+        }, "LocateButton");
+        geoLocate.startup();
+        
+        
+        
+      });
+  </script>
+
+</head>
+
+<body class="nihilo">
+  <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width: 100%; height: 100%; margin: 0;">
+    <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+      <div id="LocateButton"></div>
+      <div id="sliderWrapper">
+        <!-- slider divs -->
+        <div id="sliderOpacity" data-dojo-type="dijit/form/HorizontalSlider" data-dojo-props="showButtons:'true', value:0, minimum:0, maximum:100, discreteValues:101, intermediateChanges:true">
+          <ol id="sliderLabels" data-dojo-type="dijit/form/HorizontalRuleLabels" data-dojo-props="container:'topDecoration'">
+            <li>FOL</li>
+            <li>Imagery</li>
+          </ol>
+        </div>
+      </div> <!-- end slider divs -->
+    </div>
+  </div>
+</body>
+
+</html>
