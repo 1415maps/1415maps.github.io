@@ -1,0 +1,428 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples
+      on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+  <title>FOL</title>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.26/dijit/themes/nihilo/nihilo.css">
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.26/esri/css/esri.css">
+    
+    
+  <style>
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+
+      #map{
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #sliderWrapper {
+        position:absolute;
+        left: 30px;
+        bottom:30px;
+        z-Index: 10;
+
+        width: 250px;
+        height: 50px;
+        background: #aaa; 
+          opacity: 0.8;
+
+        -moz-box-shadow: 0 0 5px #888;
+        -webkit-box-shadow: 0 0 5px #888;
+        box-shadow: 0 0 5px #888;
+      }
+      #sliderLabels {
+        position: relative;
+        top: -1px;
+        height: 1.2em;
+        font-size: 80%;
+        font-weight: bold;
+        font-family: arial;
+        color: #ffffff;
+        padding: 3px;
+          opacity: 1.0;
+        margin: 5px 10px 0 10px;
+      }
+     #LocateButton {
+      position: absolute;
+      top: 95px;
+      left: 20px;
+      z-index: 20;
+    }
+      /*Pop Up Legend*/
+      .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 100; /* Sit on top */
+    padding-top: 10px; /* Location of the box */
+    right: 0;
+    top: 0;
+    width: 300px; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Question Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0px;
+    padding-right: 5px;
+    padding-left: 5px;
+    border: 0px solid #888;
+    width: 100%;
+    
+}
+
+/* The Close Button */
+.close {
+    color: #ffffff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #aaaaaa;
+    text-decoration: none;
+    cursor: pointer;
+}
+    
+    /* btn */
+.btn {
+  position: absolute;
+  top: 40px;
+  right: 20px;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  background-color: #555;
+  color: white;
+  font-size: 20px;
+  padding: px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  opacity: 0.7;
+}
+
+.container .btn:hover {
+  background-color: black;
+}
+      
+      .w3-teal,.w3-hover-teal:hover{color:#fff!important;background-color:#0D1D45!important}
+      
+      .w3-container,.w3-panel{padding:0.01em 16px}.w3-panel{margin-top:16px;margin-bottom:16px}
+      
+.legendImage{
+       width: auto;
+       height: 1.0em;
+    vertical-align: middle;
+      }
+      
+.rte-content {
+    color: #535456;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8rem;
+      }
+    .whatson--title {
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    padding-top: 10px;
+    color: #0d1d45;
+        font-size: 1.0rem;
+}
+      
+      .head--title {
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    padding-top: 25px;
+    color: #0d1d45;
+        font-size: 0.8rem;
+}
+    
+    
+    
+    
+    
+    </style>
+  <script type="text/javascript">
+    var dojoConfig = {
+      parseOnLoad: true
+    };
+  </script>
+  <script type="text/javascript" src="https://js.arcgis.com/3.26/"></script>
+  <script type="text/javascript">
+    require([
+        "esri/map",
+        "esri/layers/ArcGISTiledMapServiceLayer",
+        "esri/layers/FeatureLayer",
+        "esri/geometry/Point",
+        "esri/SpatialReference",
+        "dojo/on",
+        "dijit/registry",
+        "esri/dijit/LocateButton",
+        "esri/config",
+        "esri/tasks/GeometryService",
+        
+        "esri/dijit/InfoWindowLite",
+        "esri/InfoTemplate",
+        "esri/layers/FeatureLayer",
+        "dojo/dom-construct",
+        "dojo/domReady!",
+        
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+        "dijit/form/HorizontalSlider",
+        "dijit/form/HorizontalRuleLabels"
+      ],
+
+      function(
+            Map, 
+            ArcGISTiledMapServiceLayer, 
+            FeatureLayer, 
+            Point, 
+            SpatialReference, 
+            on, 
+            registry, 
+            LocateButton, 
+            esriConfig, 
+            GeometryService,
+            InfoWindowLite,
+            InfoTemplate,
+            FeatureLayer,
+            domConstruct
+        ) {
+        
+        //esriConfig geometery service
+        esriConfig.defaults.geometryService = new GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+
+        //Create Map
+        var map = new Map("map", {
+          center: new Point(1693436, 5675526, new SpatialReference({
+            wkid: 2193
+          })),
+          zoom: 8
+        });
+
+        //Add Basemap Layers for Slider
+        var oceans = new ArcGISTiledMapServiceLayer("https://maps.npdc.govt.nz/arcgis/rest/services/Aerial/MapServer");
+        map.addLayer(oceans);
+        var streets = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/FOLCache/MapServer");
+        map.addLayer(streets);
+        
+        var dynamic = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/DynamicCache/MapServer");
+        map.addLayer(dynamic);
+        
+        var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, map.root));
+        infoWindow.startup();
+        map.setInfoWindow(infoWindow);
+
+        var template = new InfoTemplate();
+        template.setTitle("<b>${Name}</b>");
+        template.setContent("<img src=${pic} width='180'><br>${Details}");
+
+        //add a Light Intallations to the map
+        var featureLayer = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Lighting_Installations/FeatureServer/0", {
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template,
+          outFields: ["Name" , "Details", "pic"],
+        });
+        map.addLayer(featureLayer);
+        
+        var template2 = new InfoTemplate();
+        template2.setTitle("<b>${Title}</b>");
+        template2.setContent("${Description}");
+        
+         //add ID Layer
+        var featureLayer2 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Identify/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template2,
+          outFields: ["Title" , "Description"],
+        });
+        map.addLayer(featureLayer2);
+        
+        var template3 = new InfoTemplate();
+        template3.setTitle("<b>${AssetGroup}</b>");
+        template3.setContent("<br>");
+        
+        //add ID Layer furniture
+        var featureLayer3 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Furniture_ID/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template3,
+          outFields: ["AssetGroup"],
+        });
+        map.addLayer(featureLayer3);
+        
+        var template4 = new InfoTemplate();
+        template4.setTitle("<b>${Title}</b>");
+        template4.setContent("${Body}");
+        
+        //add ID Layer food
+        var featureLayer4 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Food_ID/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template4,
+          outFields: ["Title", "Body"],
+        });
+        map.addLayer(featureLayer4);
+        
+        var template5 = new InfoTemplate();
+        template5.setTitle("<b>${Name}</b>");
+        template5.setContent("<br>");
+        
+        //add ID Layer Stage
+        var featureLayer5 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Stage_ID/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template5,
+          outFields: ["Name"],
+        });
+        map.addLayer(featureLayer5);
+        
+        on(featureLayer, "click", function () {
+    map.infoWindow.resize(200,300)
+            });
+        
+        on(featureLayer2, "click", function () {
+    map.infoWindow.resize(200,150)
+            });
+        
+        on(featureLayer3, "click", function () {
+    map.infoWindow.resize(200,50)
+            });
+        
+        on(featureLayer4, "click", function () {
+    map.infoWindow.resize(200,160)
+            });
+        
+        on(featureLayer5, "click", function () {
+    map.infoWindow.resize(200,300)
+            });
+
+        map.infoWindow.resize(200, 300);
+
+        //Wire event handler for the dojo slider
+        map.on("load", function() {
+          on(registry.byId('sliderOpacity'), 'change', changeOpacity);
+        });
+
+        //Slider Logic
+        function changeOpacity(op) {
+          var newOp = (op / 100);
+          streets.setOpacity(1.0 - newOp);
+          //oceans.setOpacity(newOp);
+        }
+
+        //locate button
+        geoLocate = new LocateButton({
+          map: map
+        }, "LocateButton");
+        geoLocate.startup();
+        
+var modal = document.getElementById('questionPop');
+
+var btn = document.getElementById("questionBtn");
+
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+        
+      });
+  </script>
+
+</head>
+
+<body class="nihilo">
+    
+    
+    
+  <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width: 100%; height: 100%; margin: 0;">
+    <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+      <div id="LocateButton"></div>
+      <div id="sliderWrapper">
+        <!-- slider divs -->
+        <div id="sliderOpacity" data-dojo-type="dijit/form/HorizontalSlider" data-dojo-props="showButtons:'true', value:0, minimum:0, maximum:100, discreteValues:101, intermediateChanges:true">
+          <ol id="sliderLabels" data-dojo-type="dijit/form/HorizontalRuleLabels" data-dojo-props="container:'topDecoration'">
+            <li>FOL Map</li>
+            <li>Imagery</li>
+          </ol>
+        </div>
+      </div> <!-- end slider divs -->
+    </div>
+  </div>
+<button id="questionBtn" class="btn">?</button>
+
+<!-- The Modal -->
+<div id="questionPop" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    
+      <header class="w3-container w3-teal"> 
+          <span class="close">&times;</span>
+          <br>
+          
+      <img src="img/tsb.png" width="200px">
+    </header>
+      <p><span class="whatson--title">Lights on 8.30pm – 11pm every night</span></p>
+      <p><span class="rte-content">Welcome to the new interactive festival map to help make your way around the Festival and Park.</span></p>
+      <p><span class="head--title">How to use the Map:</span><br><br>
+      <img class="legendImage" src="img/click.png"><span class="rte-content">Click on the points to get more information about them.</span><br><br>
+          <img class="legendImage" src="img/locate.png"><span class="rte-content">  Click on the locate button to get your location.</span><br><br>
+          
+          <img class="legendImage" src="img/locate.png"><br>
+          <span class="rte-content">  Use the slider to change from the festival map background to aerial photography.</span><br><br>
+      
+      
+      </p>
+      
+          
+          
+      <p>
+          <span>Map Legend</span><br>
+        <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Light Installation</span><br>
+          <img class="legendImage" src="img/entrance.png"> <span class="rte-content">Park Entrance</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">TSB Light Trail</span><br>
+          <img class="legendImage" src="img/toilet.png"> <span class="rte-content">Toilets</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Bridge</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          
+          
+      
+      </p>
+  </div>
+
+</div>
+</body>
+
+</html>
