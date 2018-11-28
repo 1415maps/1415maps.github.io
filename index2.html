@@ -31,7 +31,7 @@
         width: 250px;
         height: 50px;
         background: #aaa; 
-        opacity: 0.9;
+          opacity: 0.8;
 
         -moz-box-shadow: 0 0 5px #888;
         -webkit-box-shadow: 0 0 5px #888;
@@ -46,7 +46,7 @@
         font-family: arial;
         color: #ffffff;
         padding: 3px;
-        opacity: 1.0;
+          opacity: 1.0;
         margin: 5px 10px 0 10px;
       }
      #LocateButton {
@@ -100,18 +100,18 @@
     /* btn */
 .btn {
   position: absolute;
-  top: 155px;
-  left: 35px;
+  top: 40px;
+  right: 20px;
   transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
   background-color: #555;
   color: white;
-  font-size: 28px;
-  padding: px 25px;
+  font-size: 20px;
+  padding: px 15px;
   border: none;
   cursor: pointer;
-  border-radius: 8px;
-  opacity: 0.8;
+  border-radius: 5px;
+  opacity: 0.7;
 }
 
 .container .btn:hover {
@@ -127,19 +127,6 @@
        height: 1.0em;
     vertical-align: middle;
       }
-      
-      .legendImage2{
-       width: auto;
-       height: 1.5em;
-    vertical-align: bottom;
-      }
-      
-            .legendImage3{
-       width: auto;
-       height: 2.7em;
-    vertical-align: bottom;
-      }
-      
       
 .rte-content {
     color: #535456;
@@ -404,54 +391,33 @@ window.onclick = function(event) {
       <p><span class="whatson--title">Lights on 8.30pm – 11pm every night</span></p>
       <p><span class="rte-content">Welcome to the new interactive festival map to help make your way around the Festival and Park.</span></p>
       <p><span class="head--title">How to use the Map:</span><br><br>
-          <img class="legendImage2" src="img/zoom.png"><span class="rte-content">Use the on screen tools to zoom and pan or use your mouse or fingers. As you zoom in more features will appear.</span><br><br>
-      <img class="legendImage2" src="img/click.png"><span class="rte-content">Click on the points to get more information about them.</span><br><br>
-          <img class="legendImage2" src="img/locate2.png"><span class="rte-content">  Click on the locate button to zoom to your location.</span><br><br>
+      <img class="legendImage" src="img/click.png"><span class="rte-content">Click on the points to get more information about them.</span><br><br>
+          <img class="legendImage" src="img/locate.png"><span class="rte-content">  Click on the locate button to get your location.</span><br><br>
           
-          <img class="legendImage3" src="img/slider.png"><br>
-          <span class="rte-content">  Drag the slider handle to change from the festival map background to aerial photography.</span><br>
-
-      </p> 
+          <img class="legendImage" src="img/locate.png"><br>
+          <span class="rte-content">  Use the slider to change from the festival map background to aerial photography.</span><br><br>
+      
+      
+      </p>
+      
+          
+          
       <p>
-          <span class="head--title">Map Legend</span><br><br>
-        &nbsp;<img class="legendImage" src="img/entrance.png"> &nbsp;&nbsp;<span class="rte-content">Entrance</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/bridge.png"> <span class="rte-content">Bridge</span><br>
-          
-          <img class="legendImage" src="img/lighttrail.png"> <span class="rte-content">TSB Light Trail</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
-          <img class="legendImage" src="img/tree.png"> <span class="rte-content">Trees</span><br>
-          
-          <img class="legendImage" src="img/toilet.png"> <span class="rte-content">Toilets</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/lawn.png">&nbsp; <span class="rte-content">Lawn</span><br>
-          
-          &nbsp;<img class="legendImage" src="img/parking.png">&nbsp;&nbsp; <span class="rte-content">Parking</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/building.png"> &nbsp;<span class="rte-content">Buildings</span><br>
-          
-          &nbsp;<img class="legendImage" src="img/hub.png">&nbsp;&nbsp; <span class="rte-content">Festival Hub</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/bike.png"> &nbsp;<span class="rte-content">Bike Rack</span><br>
-          
-          &nbsp;&nbsp;<img class="legendImage" src="img/donation.png">&nbsp;&nbsp;&nbsp; <span class="rte-content">Donation Box</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/rowBoat.png"> &nbsp;&nbsp;<span class="rte-content">Row Boat Hire</span><br>
-          
-          &nbsp;<img class="legendImage" src="img/food.png">&nbsp;&nbsp; <span class="rte-content">Food</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/picnic.png"> &nbsp;&nbsp;<span class="rte-content">Picnic Table</span><br>
-          
-          &nbsp;<img class="legendImage" src="img/liquor.png">&nbsp;&nbsp; <span class="rte-content">Liqour Allowed</span>&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/rubbish.png"> &nbsp;&nbsp;<span class="rte-content">Rubbish Bin</span><br>
-          
-          &nbsp;<img class="legendImage" src="img/coffee.png">&nbsp;&nbsp; <span class="rte-content">Coffee</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/seat.png">&nbsp;&nbsp; <span class="rte-content">Seat</span><br><br>
+          <span>Map Legend</span><br>
+        <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Light Installation</span><br>
+          <img class="legendImage" src="img/entrance.png"> <span class="rte-content">Park Entrance</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">TSB Light Trail</span><br>
+          <img class="legendImage" src="img/toilet.png"> <span class="rte-content">Toilets</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Bridge</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
+          <img class="legendImage" src="img/liquor.png"> <span class="rte-content">Liquor Control</span><br>
           
           
-          <span class="head--title">Accessibility Key</span><br><br>
-          
-          <img class="legendImage" src="img/accessparking.png"> <span class="rte-content">Car Park</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <img class="legendImage" src="img/.png"> <span class="rte-content">Mobility Hire</span><br>
-          
-          <img class="legendImage" src="img/.png"> <span class="rte-content">Steep Slope</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
-          <img class="legendImage" src="img/stairs.png"> <span class="rte-content">Steps</span><br>
-          
-          <img class="legendImage" src="img/toilet.png"> <span class="rte-content">Toilets</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-          <img class="legendImage" src="img/lawn.png"> <span class="rte-content">Pedestrain Access Only</span><br>
       
       </p>
   </div>
