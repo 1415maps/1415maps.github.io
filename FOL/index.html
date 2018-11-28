@@ -97,18 +97,27 @@
     /* btn */
 .btn {
   position: absolute;
-  top: 155px;
-  left: 35px;
-  transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  background-color: #555;
-  color: white;
-  font-size: 28px;
-  padding: px 5px;
-  border: none;
-  cursor: pointer;
-  border-radius: 8px;
-  opacity: 0.8;
+  top: 135px;
+  left: 20px;
+  padding: 2px;
+    width: 36px;
+    height: 36px;
+
+    background-color: #666;
+    background-color: rgba(102,102,102,0.80);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+    background-image: url(img/q.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: #666;
 }
 
 .container .btn:hover {
@@ -390,7 +399,7 @@ window.onclick = function(event) {
       </div> <!-- end slider divs -->
     </div>
   </div>
-<button id="questionBtn" class="btn">?</button>
+<button id="questionBtn" class="btn"></button>
 
 <!-- The Modal -->
 <div id="questionPop" class="modal">
