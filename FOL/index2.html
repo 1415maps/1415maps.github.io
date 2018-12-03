@@ -39,9 +39,9 @@
         position: relative;
         top: -1px;
         height: 1.2em;
-        font-size: 60%;
+        font-size: 80%;
         font-weight: bold;
-        font-family: sans-serif;
+        font-family: arial;
         color: #ffffff;
         padding: 3px;
         opacity: 1.0;
@@ -241,13 +241,12 @@
         //Add Basemap Layers for Slider
         var oceans = new ArcGISTiledMapServiceLayer("https://maps.npdc.govt.nz/arcgis/rest/services/Aerial/MapServer");
         map.addLayer(oceans);
-        var streets = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/FOL_Basemap/MapServer");
+        var streets = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/FOLCache/MapServer");
         map.addLayer(streets);
         
-        var dynamic = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/FOL_Dynamic/MapServer");
+        var dynamic = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/DynamicCache/MapServer");
         map.addLayer(dynamic);
         
-        //Info Window Create
         var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, map.root));
         infoWindow.startup();
         map.setInfoWindow(infoWindow);
@@ -266,14 +265,14 @@
         
         var template2 = new InfoTemplate();
         template2.setTitle("<b>${Title}</b>");
-        template2.setContent("${Descp}");
+        template2.setContent("${Description}");
         
          //add ID Layer
         var featureLayer2 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Identify/FeatureServer/0", {
           opacity: 0.0,
           mode: FeatureLayer.MODE_ONDEMAND,
           infoTemplate:template2,
-          outFields: ["Title" , "Descp"],
+          outFields: ["Title" , "Description"],
         });
         map.addLayer(featureLayer2);
         
@@ -393,8 +392,8 @@ window.onclick = function(event) {
         <!-- slider divs -->
         <div id="sliderOpacity" data-dojo-type="dijit/form/HorizontalSlider" data-dojo-props="showButtons:'true', value:0, minimum:0, maximum:100, discreteValues:101, intermediateChanges:true">
           <ol id="sliderLabels" data-dojo-type="dijit/form/HorizontalRuleLabels" data-dojo-props="container:'topDecoration'">
-            <li>Graphic Map</li>
-            <li>Terrian Map</li>
+            <li>FOL Map</li>
+            <li>Imagery</li>
           </ol>
         </div>
       </div> <!-- end slider divs -->
