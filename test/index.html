@@ -1,0 +1,494 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <!--The viewport meta tag for iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no" />
+  <title>FOL Map</title>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.26/dijit/themes/nihilo/nihilo.css">
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.26/esri/css/esri.css">
+   
+  <style>
+    html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+
+      #map{
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      #sliderWrapper {
+        position:absolute;
+        left: 30px;
+        bottom:30px;
+        z-Index: 10;
+
+        width: 250px;
+        height: 50px;
+        background: #aaa; 
+        opacity: 0.9;
+
+        -moz-box-shadow: 0 0 5px #888;
+        -webkit-box-shadow: 0 0 5px #888;
+        box-shadow: 0 0 5px #888;
+      }
+      #sliderLabels {
+        position: relative;
+        top: -1px;
+        height: 1.2em;
+        font-size: 60%;
+        font-weight: bold;
+        font-family: sans-serif;
+        color: #ffffff;
+        padding: 3px;
+        opacity: 1.0;
+        margin: 5px 10px 0 10px;
+      }
+     #LocateButton {
+      position: absolute;
+      top: 95px;
+      left: 20px;
+      z-index: 20;
+    }
+      /*Pop Up Legend*/
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 100; 
+    padding-top: 10px; 
+    right: 0;
+    top: 0;
+    width: 300px; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgb(0,0,0); 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+/* Question Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0px;
+    padding-right: 0px;
+    padding-left: 0px;
+    border: 0px solid #888;
+    width: 100%;
+    
+}
+
+.close {
+    color: #ffffff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+      
+.close:hover,
+.close:focus {
+    color: #aaaaaa;
+    text-decoration: none;
+    cursor: pointer;
+}
+    
+    /* btn */
+.btn {
+  position: absolute;
+  top: 135px;
+  left: 20px;
+  padding: 2px;
+    width: 36px;
+    height: 36px;
+
+    background-color: #666;
+    background-color: rgba(102,102,102,0.80);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+    background-image: url(img/q.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: #666;
+}
+
+.container .btn:hover {
+  background-color: black;
+}
+      
+.w3-teal,.w3-hover-teal:hover{color:#fff!important;background-color:#0D1D45!important}
+      
+.w3-container,.w3-panel{padding:0.01em 16px}.w3-panel{margin-top:16px;margin-bottom:16px}
+      
+.legendImage{
+       width: auto;
+       height: 1.0em;
+    vertical-align: middle;
+      }
+      
+.legendImage2{
+       width: auto;
+       height: 1.5em;
+    vertical-align: bottom;
+      }
+      
+.legendImage3{
+       width: auto;
+       height: 2.7em;
+    vertical-align: bottom;
+      }
+      
+.legendImage4{
+       width: auto;
+       height: 1.8em;
+    vertical-align: middle;
+      }
+            
+.rte-content {
+    color: #535456;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.8rem;
+      }
+.whatson--title {
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    padding-top: 10px;
+    color: #0d1d45;
+        font-size: 1.0rem;
+}
+      
+.head--title {
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    padding-top: 25px;
+    color: #0d1d45;
+        font-size: 0.8rem;
+}
+    
+.div-pad{
+          padding-right: 5px;
+    padding-left: 5px;
+      }
+    
+    </style>
+  <script type="text/javascript">
+    var dojoConfig = {
+      parseOnLoad: true
+    };
+  </script>
+  <script type="text/javascript" src="https://js.arcgis.com/3.26/"></script>
+  <script type="text/javascript">
+    require([
+        "esri/map",
+        "esri/layers/ArcGISTiledMapServiceLayer",
+        "esri/layers/FeatureLayer",
+        "esri/geometry/Point",
+        "esri/SpatialReference",
+        "dojo/on",
+        "dijit/registry",
+        "esri/dijit/LocateButton",
+        "esri/config",
+        "esri/tasks/GeometryService",
+        
+        "esri/dijit/InfoWindowLite",
+        "esri/InfoTemplate",
+        "esri/layers/FeatureLayer",
+        "dojo/dom-construct",
+        "dojo/domReady!",
+        
+        "dijit/layout/BorderContainer",
+        "dijit/layout/ContentPane",
+        "dijit/form/HorizontalSlider",
+        "dijit/form/HorizontalRuleLabels"
+      ],
+
+      function(
+            Map, 
+            ArcGISTiledMapServiceLayer, 
+            FeatureLayer, 
+            Point, 
+            SpatialReference, 
+            on, 
+            registry, 
+            LocateButton, 
+            esriConfig, 
+            GeometryService,
+            InfoWindowLite,
+            InfoTemplate,
+            FeatureLayer,
+            domConstruct
+        ) {
+        
+        //esriConfig geometery service
+        esriConfig.defaults.geometryService = new GeometryService("https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer");
+
+        //Create Map
+        var map = new Map("map", {
+          center: new Point(1693436, 5675526, new SpatialReference({
+            wkid: 2193
+          })),
+          zoom: 8
+        });
+
+        //Add Basemap Layers for Slider
+        var oceans = new ArcGISTiledMapServiceLayer("https://maps.npdc.govt.nz/arcgis/rest/services/Aerial/MapServer");
+        map.addLayer(oceans);
+        var streets = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/FOL_Basemap/MapServer");
+        map.addLayer(streets);
+        
+        var dynamic = new ArcGISTiledMapServiceLayer("https://tiles.arcgis.com/tiles/CELV55JOzi8rK7dx/arcgis/rest/services/FOL_Dynamic/MapServer");
+        map.addLayer(dynamic);
+        
+        //Info Window Create
+        var infoWindow = new InfoWindowLite(null, domConstruct.create("div", null, null, map.root));
+        infoWindow.startup();
+        map.setInfoWindow(infoWindow);
+
+        var template = new InfoTemplate();
+        template.setTitle("<b>${Name}</b>");
+        template.setContent("<img src=${pic} width='180'><br>${Details}");
+
+        //add a Light Intallations to the map
+        var featureLayer = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Lighting_Installations/FeatureServer/0", {
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template,
+          outFields: ["Name" , "Details", "pic"],
+        });
+        map.addLayer(featureLayer);
+        
+        var template2 = new InfoTemplate();
+        template2.setTitle("<b>${Title}</b>");
+        template2.setContent("${Descp}");
+        
+         //add ID Layer
+        var featureLayer2 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Identify/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template2,
+          outFields: ["Title" , "Descp"],
+        });
+        map.addLayer(featureLayer2);
+        
+        var template3 = new InfoTemplate();
+        template3.setTitle("<b>${AssetGroup}</b>");
+        template3.setContent("<br>");
+        
+        //add ID Layer furniture
+        var featureLayer3 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Furniture_ID/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template3,
+          outFields: ["AssetGroup"],
+        });
+        map.addLayer(featureLayer3);
+        
+        var template4 = new InfoTemplate();
+        template4.setTitle("<b>${Title}</b>");
+        template4.setContent("${Body}");
+        
+        //add ID Layer food
+        var featureLayer4 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Food_ID/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template4,
+          outFields: ["Title", "Body"],
+        });
+        map.addLayer(featureLayer4);
+        
+        var template5 = new InfoTemplate();
+        template5.setTitle("<b>${Name}</b>");
+        template5.setContent("<a href='${URL}' target='_blank' style='color:blue; font-size:15px;'>WHAT'S ON</a><br><img src=${Sponsor} width='180'><br>${Description}");
+        
+        //add ID Layer Stage
+        var featureLayer5 = new FeatureLayer("https://services9.arcgis.com/CELV55JOzi8rK7dx/arcgis/rest/services/Stage_ID/FeatureServer/0", {
+          opacity: 0.0,
+          mode: FeatureLayer.MODE_ONDEMAND,
+          infoTemplate:template5,
+          outFields: ["Name", "Sponsor", "Description", "URL"],
+        });
+        map.addLayer(featureLayer5);
+        
+        on(featureLayer, "click", function () {
+    map.infoWindow.resize(200,300)
+            });
+        
+        on(featureLayer2, "click", function () {
+    map.infoWindow.resize(200,150)
+            });
+        
+        on(featureLayer3, "click", function () {
+    map.infoWindow.resize(200,50)
+            });
+        
+        on(featureLayer4, "click", function () {
+    map.infoWindow.resize(200,160)
+            });
+        
+        on(featureLayer5, "click", function () {
+    map.infoWindow.resize(200,300)
+            });
+
+        map.infoWindow.resize(200, 300);
+
+        //Wire event handler for the dojo slider
+        map.on("load", function() {
+          on(registry.byId('sliderOpacity'), 'change', changeOpacity);
+        });
+
+        //Slider Logic
+        function changeOpacity(op) {
+          var newOp = (op / 100);
+          streets.setOpacity(1.0 - newOp);
+          //oceans.setOpacity(newOp);
+        }
+
+        //locate button
+        geoLocate = new LocateButton({
+          map: map
+        }, "LocateButton");
+        geoLocate.startup();
+        
+var modal = document.getElementById('questionPop');
+
+var btn = document.getElementById("questionBtn");
+
+var span = document.getElementsByClassName("close")[0];
+        
+        modal.style.display = "block";
+
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+        
+      });
+  </script>
+
+</head>
+
+<body class="nihilo">
+    
+    
+    
+  <div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width: 100%; height: 100%; margin: 0;">
+    <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+      <div id="LocateButton"></div>
+      <div id="sliderWrapper">
+        <!-- slider divs -->
+        <div id="sliderOpacity" data-dojo-type="dijit/form/HorizontalSlider" data-dojo-props="showButtons:'true', value:0, minimum:0, maximum:100, discreteValues:101, intermediateChanges:true">
+          <ol id="sliderLabels" data-dojo-type="dijit/form/HorizontalRuleLabels" data-dojo-props="container:'topDecoration'">
+            <li>Graphic Map</li>
+            <li>Terrain Map</li>
+          </ol>
+        </div>
+      </div> <!-- end slider divs -->
+    </div>
+  </div>
+<button id="questionBtn" class="btn"></button>
+
+<!-- The Modal -->
+<div id="questionPop" class="modal">
+
+  <!-- Modal content -->
+  <div class="modal-content">
+    
+      <header class="w3-container w3-teal"> 
+          <span class="close">&times;</span>
+          <br>
+          
+      <img src="img/tsb.png" width="200px">
+    </header>
+      <div class="div-pad">
+      <p><span class="whatson--title">Lights on 8.30pm – 11pm every night</span></p>
+      <p><span class="rte-content">Welcome to the new interactive festival map to help make your way around the festival and park.</span></p>
+      <p><span class="head--title">How to use the map:</span><br><br>
+          <img class="legendImage2" src="img/zoom.png"><span class="rte-content">Use the on screen tools to zoom or use your mouse or fingers to pan and zoom. As you zoom in more features will appear.</span><br><br>
+      <img class="legendImage2" src="img/click.png"><span class="rte-content">Click on the points to get more information about them.</span><br><br>
+          <img class="legendImage2" src="img/locate2.png"><span class="rte-content">  Click on the locate button to zoom to your location.</span><br><br>
+          
+          <img class="legendImage3" src="img/slider2.png"><br>
+          <span class="rte-content">  Drag the slider handle to change from the festival map background to aerial photography.</span><br>
+
+      </p> 
+      <p>
+          <span class="head--title">Map legend</span><br><br>
+          
+          
+          &nbsp;<img class="legendImage" src="https://i.imgur.com/4anAdr5.gif"> &nbsp;&nbsp;
+          <span class="rte-content">Lighting installation</span><br>
+          
+          
+        &nbsp;<img class="legendImage" src="img/entrance.png"> &nbsp;&nbsp;
+          <span class="rte-content">Entrance</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/bridge.png"> <span class="rte-content">Bridge</span><br>
+          
+          <img class="legendImage" src="img/lighttrail.png"> <span class="rte-content">TSB light trail</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
+          <img class="legendImage" src="img/tree.png"> <span class="rte-content">Trees</span><br>
+          
+          <img class="legendImage" src="img/toilet.png"> <span class="rte-content">Toilets</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/lawn.png">&nbsp; <span class="rte-content">Lawn</span><br>
+          
+          &nbsp;<img class="legendImage" src="img/parking.png">&nbsp;&nbsp; <span class="rte-content">Parking</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/building.png"> &nbsp;<span class="rte-content">Buildings</span><br>
+          
+          &nbsp;<img class="legendImage" src="img/hub.png">&nbsp;&nbsp; <span class="rte-content">Festival hub</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/bike.png"> &nbsp;<span class="rte-content">Bike rack</span><br>
+          
+          &nbsp;&nbsp;<img class="legendImage" src="img/donation.png">&nbsp;&nbsp;&nbsp; <span class="rte-content">Donation box</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/rowBoat.png"> &nbsp;&nbsp;<span class="rte-content">Row boat hire</span><br>
+          
+          &nbsp;<img class="legendImage" src="img/food.png">&nbsp;&nbsp; <span class="rte-content">Food</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/picnic.png"> &nbsp;&nbsp;<span class="rte-content">Picnic table</span><br>
+          
+          &nbsp;<img class="legendImage" src="img/liquor.png">&nbsp;&nbsp; <span class="rte-content">Liqour allowed</span>&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/rubbish.png"> &nbsp;&nbsp;<span class="rte-content">Rubbish bin</span><br>
+          
+          &nbsp;<img class="legendImage" src="img/coffee.png">&nbsp;&nbsp; <span class="rte-content">Coffee</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/seat.png">&nbsp;&nbsp; <span class="rte-content">Seat</span><br><br>
+          
+          
+          <span class="head--title">Accessibility key</span><br><br>
+          
+          &nbsp;<img class="legendImage" src="img/accessparking.png">&nbsp;&nbsp; <span class="rte-content">Car park</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <img class="legendImage" src="img/accessRent.png"> <span class="rte-content">Mobility hire</span><br>
+          
+          &nbsp;<img class="legendImage" src="img/path.png"> &nbsp;<span class="rte-content">Steep slope</span>&nbsp;&nbsp;&nbsp;  
+          <img class="legendImage" src="img/stairs.png"> <span class="rte-content">Steps</span><br>
+          
+          <img class="legendImage" src="img/toilet.png"> <span class="rte-content">Toilets</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          <img class="legendImage" src="img/entrance.png"> <span class="rte-content">Pedestrian acess</span><br>
+      
+      </p>
+          <p><br>&nbsp;&nbsp;&nbsp;<span class="rte-content">Mapping application by: </span> &nbsp;<a href="http://1415.nz" target="_blank" ><img class="legendImage4" src="img/1415.png"></a></p>
+          
+          </div>
+      
+      <footer class="w3-container w3-teal"> 
+    <p>
+      <img src="img/npdc.png" width="70px">
+        </p>
+    </footer>
+  </div>
+
+</div>
+</body>
+
+</html>
